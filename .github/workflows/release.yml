@@ -18,14 +18,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Python Semantic Release
         id: psr
-        uses: python-semantic-release/python-semantic-release@v10
+        uses: python-semantic-release/python-semantic-release@9a026e9303981c866c3425723009becb2437c757 # v10.6.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           changelog: "false"
@@ -33,7 +33,7 @@ jobs:
       - name: Generate release notes with git-cliff
         id: git-cliff
         if: steps.psr.outputs.released == 'true'
-        uses: orhun/git-cliff-action@v4
+        uses: orhun/git-cliff-action@3d96a18cc4ec17e9dc69ddcc424ccafaf1f78ce2 # v4.9.0
         with:
           config: cliff.toml
           args: --verbose --latest --strip header
@@ -44,7 +44,7 @@ jobs:
 
       - name: Update GitHub Release notes
         if: steps.psr.outputs.released == 'true'
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         with:
           tag_name: v${{ steps.psr.outputs.version }}
           body: ${{ steps.git-cliff.outputs.content }}
