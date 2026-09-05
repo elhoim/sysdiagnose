@@ -27,6 +27,13 @@ class TestParsersNetworkExtension(SysdiagnoseTestCase):
                 self.assertTrue("Version" in result)
                 self.assert_result_summary_consistent(p, result)
 
+    def test_is_compatible_without_case_model(self):
+        """A case whose metadata carries no "model" must not crash is_compatible()."""
+        case = {"case_id": "networkextension-no-model", "ios_version": "16.0"}
+        p = NetworkExtensionParser(self.sd.config, case=case)
+        self.assertIsNone(p.case_model)
+        self.assertIsInstance(p.is_compatible(), bool)
+
 
 if __name__ == "__main__":
     unittest.main()
