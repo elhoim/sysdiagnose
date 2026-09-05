@@ -21,7 +21,9 @@ class MobileBackupParser(BaseParserInterface):
     def is_compatible(self) -> bool:
         version_compatibility = super().is_compatible()
         # not compatible with Apple TV
-        device_compatibility = "AppleTV" not in self.case_model and "Watch" not in self.case_model
+        # case_model is None when the case metadata carries no model; treat that as compatible
+        case_model = self.case_model or ""
+        device_compatibility = "AppleTV" not in case_model and "Watch" not in case_model
         # both need to be compatible
         return version_compatibility and device_compatibility
 
