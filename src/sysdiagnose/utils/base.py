@@ -367,7 +367,21 @@ class BaseInterface(ABC):
             self._result = [] if self.format == "jsonl" else {}
             return self._result, self._result_summary
 
-        num_events = self._write_result(result, indent=indent)
+        try:
+            num_events = self._write_result(result, indent=indent)
+        except Exception as ex:
+            # A partially written output file must never be served as a complete cached result:
+            # output_exists() would be true and _load_output() would return the truncated data.
+            logger.exception(f"Writing result failed: {ex}")
+            try:
+                os.remove(self.output_file)
+            except OSError:
+                logger.warning(f"Could not remove partially written {self.output_file}")
+            handler.update(num_events=0, add_errors=1, end=True)
+            self._result_summary = handler.get()
+            self._result = [] if self.format == "jsonl" else {}
+            return self._result, self._result_summary
+
         handler.update(num_events=num_events, end=True)
         return self._result, handler.get()
 
